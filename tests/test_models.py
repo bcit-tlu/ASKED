@@ -36,3 +36,14 @@ def test_empty_session():
     assert session.questions_asked == 0
     assert session.average_score == 0.0
     assert session.is_complete is False
+
+
+def test_session_material_summary_default_empty():
+    session = AssessmentSession(subject="computer science")
+    assert session.material_summary == ""
+
+
+def test_session_material_summary_stored():
+    session = AssessmentSession(subject="computer science")
+    session.material_summary = "Key topics: OOP, recursion, data structures"
+    assert "OOP" in session.material_summary
