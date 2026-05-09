@@ -11,11 +11,13 @@ A proof-of-concept prototype that uses multiple AI agents to conduct conversatio
 │              Streamlit Frontend              │
 ├─────────────────────────────────────────────┤
 │              CrewAI Orchestrator             │
-├──────────┬──────────┬───────────────────────┤
-│ Question │ Evaluator│   Difficulty          │
-│ Generator│  Agent   │   Adjuster Agent      │
-├──────────┴──────────┴───────────────────────┤
-│              Ollama (Local LLM)              │
+├──────────┬──────────┬──────────┬────────────┤
+│  Study   │ Question │ Evaluator│ Difficulty │
+│  Agent   │ Generator│  Agent   │ Adjuster   │
+├──────────┴──────────┴──────────┴────────────┤
+│         Ollama (Local LLM)                  │
+├─────────────────────────────────────────────┤
+│         materials/ (course content)         │
 └─────────────────────────────────────────────┘
 ```
 
@@ -61,6 +63,7 @@ ASSESS_OLLAMA_MODEL=qwen3.5:cloud
 ASSESS_SUBJECT_DOMAIN=computer science
 ASSESS_MAX_QUESTIONS_PER_SESSION=10
 ASSESS_INITIAL_DIFFICULTY=3
+ASSESS_MATERIALS_DIR=materials
 ```
 
 ### Running the App
@@ -88,6 +91,7 @@ ASKED/
 │   ├── app.py                  # Streamlit frontend
 │   ├── agents/
 │   │   ├── __init__.py
+│   │   ├── study_agent.py
 │   │   ├── question_generator.py
 │   │   ├── evaluator.py
 │   │   └── difficulty_adjuster.py
@@ -106,6 +110,8 @@ ASKED/
 │   ├── __init__.py
 │   ├── test_agents.py
 │   └── test_models.py
+├── materials/              # Drop course content here
+│   └── sample.md
 ├── docs/
 │   └── design.md
 ├── conftest.py             # Adds src/ to sys.path for pytest
