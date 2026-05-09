@@ -12,13 +12,16 @@ def create_question_generator() -> Agent:
     return Agent(
         role="Question Generator",
         goal=(
-            f"Generate clear, educational assessment questions about {settings.subject_domain} "
-            "at the specified difficulty level that test genuine understanding."
+            "Generate clear, educational assessment questions based on the provided "
+            "study material summary at the specified difficulty level that test "
+            "genuine understanding of the material."
         ),
         backstory=(
             "You are an experienced educator who specialises in crafting questions that "
-            "reveal depth of understanding. You create questions that are clear, unambiguous, "
-            "and appropriately challenging for the given difficulty level."
+            "reveal depth of understanding. You create questions grounded in specific "
+            "course materials — never fabricating content beyond what the materials cover. "
+            "Your questions are clear, unambiguous, and appropriately challenging for "
+            "the given difficulty level."
         ),
         verbose=True,
         allow_delegation=False,

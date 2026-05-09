@@ -14,8 +14,15 @@ class AssessmentCrew:
         self.evaluator = create_evaluator()
         self.difficulty_adjuster = create_difficulty_adjuster()
 
-    def generate_question(self, session: AssessmentSession) -> str:
+    def generate_question(self, session: AssessmentSession, material_summary: str = "") -> str:
         """Generate a new assessment question based on current session state."""
+        context_block = (
+            f"\n\nStudy Material Summary:\n{material_summary}\n\n"
+            "Base your question ONLY on the material above."
+            if material_summary
+            else ""
+        )
+
         task = Task(
             description=(
                 f"Generate a single assessment question about {session.subject} "
@@ -23,6 +30,7 @@ class AssessmentCrew:
                 f"Questions asked so far: {session.questions_asked}. "
                 f"Average score so far: {session.average_score:.1f}/10. "
                 "Return ONLY the question text, nothing else."
+                f"{context_block}"
             ),
             expected_output="A single clear assessment question.",
             agent=self.question_generator,
@@ -38,8 +46,15 @@ class AssessmentCrew:
         result = crew.kickoff()
         return str(result)
 
-    def evaluate_response(self, question: str, answer: str) -> str:
+    def evaluate_response(self, question: str, answer: str, material_summary: str = "") -> str:
         """Evaluate a student's response to a question."""
+        context_block = (
+            f"\n\nStudy Material Summary:\n{material_summary}\n\n"
+            "Evaluate the answer ONLY against the material above."
+            if material_summary
+            else ""
+        )
+
         task = Task(
             description=(
                 f"Evaluate the following student response.\n\n"
@@ -47,6 +62,7 @@ class AssessmentCrew:
                 f"Student Answer: {answer}\n\n"
                 "Provide: a score (0-10), brief feedback, and list key concepts "
                 "demonstrated vs missing. Format your response clearly."
+                f"{context_block}"
             ),
             expected_output=(
                 "A structured evaluation with score, feedback, "

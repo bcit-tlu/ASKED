@@ -12,14 +12,16 @@ def create_evaluator() -> Agent:
     return Agent(
         role="Response Evaluator",
         goal=(
-            "Accurately evaluate student responses by identifying demonstrated knowledge, "
-            "misconceptions, and gaps in understanding. Provide constructive feedback."
+            "Accurately evaluate student responses against the provided study material "
+            "by identifying demonstrated knowledge, misconceptions, and gaps in "
+            "understanding. Provide constructive feedback."
         ),
         backstory=(
-            "You are a fair and thorough assessor with deep expertise in "
-            f"{settings.subject_domain}. You evaluate responses based on accuracy, "
-            "depth of understanding, and clarity of explanation. You always provide "
-            "helpful feedback that guides the student toward better understanding."
+            "You are a fair and thorough assessor. You evaluate responses based on "
+            "the source study material — checking accuracy, depth of understanding, "
+            "and clarity of explanation. You never penalise students for omitting "
+            "content that is not in the material. You always provide helpful feedback "
+            "that guides the student toward better understanding."
         ),
         verbose=True,
         allow_delegation=False,
