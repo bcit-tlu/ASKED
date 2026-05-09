@@ -1,0 +1,98 @@
+from crewai import Crew, Task, Process
+
+from agents.question_generator import create_question_generator
+from agents.evaluator import create_evaluator
+from agents.difficulty_adjuster import create_difficulty_adjuster
+from models.session import AssessmentSession
+
+
+class AssessmentCrew:
+    """Orchestrates the multi-agent assessment workflow using CrewAI."""
+
+    def __init__(self):
+        self.question_generator = create_question_generator()
+        self.evaluator = create_evaluator()
+        self.difficulty_adjuster = create_difficulty_adjuster()
+
+    def generate_question(self, session: AssessmentSession) -> str:
+        """Generate a new assessment question based on current session state."""
+        task = Task(
+            description=(
+                f"Generate a single assessment question about {session.subject} "
+                f"at difficulty level {session.current_difficulty} (scale 1-5). "
+                f"Questions asked so far: {session.questions_asked}. "
+                f"Average score so far: {session.average_score:.1f}/10. "
+                "Return ONLY the question text, nothing else."
+            ),
+            expected_output="A single clear assessment question.",
+            agent=self.question_generator,
+        )
+
+        crew = Crew(
+            agents=[self.question_generator],
+            tasks=[task],
+            process=Process.sequential,
+            verbose=True,
+        )
+
+        result = crew.kickoff()
+        return str(result)
+
+    def evaluate_response(self, question: str, answer: str) -> str:
+        """Evaluate a student's response to a question."""
+        task = Task(
+            description=(
+                f"Evaluate the following student response.\n\n"
+                f"Question: {question}\n\n"
+                f"Student Answer: {answer}\n\n"
+                "Provide: a score (0-10), brief feedback, and list key concepts "
+                "demonstrated vs missing. Format your response clearly."
+            ),
+            expected_output=(
+                "A structured evaluation with score, feedback, "
+                "concepts demonstrated, and concepts missing."
+            ),
+            agent=self.evaluator,
+        )
+
+        crew = Crew(
+            agents=[self.evaluator],
+            tasks=[task],
+            process=Process.sequential,
+            verbose=True,
+        )
+
+        result = crew.kickoff()
+        return str(result)
+
+    def adjust_difficulty(self, session: AssessmentSession) -> int:
+        """Determine the next difficulty level based on session history."""
+        history_summary = ""
+        for i, record in enumerate(session.history[-3:], 1):
+            score = record.evaluation.score if record.evaluation else "N/A"
+            history_summary += f"Q{i}: score={score}/10\n"
+
+        task = Task(
+            description=(
+                f"Current difficulty: {session.current_difficulty}/5.\n"
+                f"Recent performance:\n{history_summary}\n"
+                "Based on this performance, what should the next difficulty level be? "
+                "Respond with ONLY a single integer from 1 to 5."
+            ),
+            expected_output="A single integer from 1 to 5.",
+            agent=self.difficulty_adjuster,
+        )
+
+        crew = Crew(
+            agents=[self.difficulty_adjuster],
+            tasks=[task],
+            process=Process.sequential,
+            verbose=True,
+        )
+
+        result = crew.kickoff()
+        try:
+            new_difficulty = int(str(result).strip())
+            return max(1, min(5, new_difficulty))
+        except ValueError:
+            return session.current_difficulty
