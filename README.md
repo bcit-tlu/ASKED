@@ -1,6 +1,6 @@
-# ASKED
+# DIALOG
 
-Assessment of Student Knowledge through Evaluative Dialogue
+Diagnostic Interactive Assessment of Learning through Open Grading
 
 A proof-of-concept prototype that uses multiple AI agents to conduct conversational knowledge assessments with students.
 
@@ -42,7 +42,7 @@ A proof-of-concept prototype that uses multiple AI agents to conduct conversatio
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd ASKED
+cd dialog
 
 # Create virtual environment (use python3.11 or python3.12)
 python3.11 -m venv .venv
@@ -85,7 +85,7 @@ pytest
 ## Project Structure
 
 ```
-ASKED/
+dialog/
 ├── src/
 │   ├── __init__.py
 │   ├── app.py                  # Streamlit frontend
